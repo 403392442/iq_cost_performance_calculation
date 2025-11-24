@@ -1,0 +1,22 @@
+{
+  "name": "iq_cost_performance_calculation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --run start -- --watch",
+    "test": "node --test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "googleapis": "^166.0.0",
+    "node-cron": "^4.2.1",
+    "node-fetch": "^3.3.2"
+  }
+}
