@@ -6,7 +6,7 @@ dotenv.config();
  * GOAL: Desperate this function
  * @returns {Promise<void>}
  */
-const tempWriteToGoogleSheets = async(priceUpdateRequiredUnit, techPerformanceResult, qcPerformanceResult) => {
+const writeToGoogleSheets = async(priceUpdateRequiredUnit, techPerformanceResult, qcPerformanceResult) => {
     const sheetsHandler = getSheetsClient();
     const today = new Date();
     const date = (today.getMonth()+1) + "/" + today.getDate()  + "/" + today.getFullYear()
@@ -120,5 +120,5 @@ const tempWriteToGoogleSheets = async(priceUpdateRequiredUnit, techPerformanceRe
 }
 
 module.exports = {
-    tempWriteToGoogleSheets,
+    tempWriteToGoogleSheets: writeToGoogleSheets,
 }

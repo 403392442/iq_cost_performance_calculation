@@ -1,17 +1,5 @@
 const { GOOGLE_SHEET_PERFORMANCE_TABLE_COLUMN_NAME_ARRAY } = require('../utils/constants');
 
-const cleanModelData = (modelData, typeSet) => {
-    const modelDataMap = new Map();
-    for (const [modelNumber, type] of modelData) {
-        if (typeSet.has(type)) {
-            modelDataMap.set(modelNumber, type);
-        } else {
-            modelDataMap.set(modelNumber, "Other")
-        }
-    }
-    return modelDataMap;
-}
-
 const cleanUnfinishedPOData = (poData) => {
     const tempSet = new Set();
     for (const poNumber of poData.flat()) {
@@ -82,7 +70,6 @@ const cleanPerformanceData = (techPerformanceData, qcPerformanceData) => {
 
 
 module.exports = {
-    cleanModelData,
     cleanUnfinishedPOData,
     cleanProcessCostData,
     cleanPerformanceData,
