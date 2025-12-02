@@ -2,7 +2,8 @@ const dotenv = require('dotenv');
 const getSheetsClient = require("../Google_Sheets/getGoogleSheetsClient");
 dotenv.config();
 
-const writeToGoogleSheets = async(techPerformanceResult, qcPerformanceResult, time) => {
+const writeToGoogleSheets = async(dailyWorkedOnUnits, techPerformanceResult, qcPerformanceResult, time) => {
+    const unitsDetails = Object.values(dailyWorkedOnUnits).map(Object.values)
     const sheetsHandler = getSheetsClient();
     const today = new Date();
     const date = (today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear()
@@ -60,6 +61,13 @@ const writeToGoogleSheets = async(techPerformanceResult, qcPerformanceResult, ti
                 data: performanceReport,
                 valueInputOption: "RAW"
             }
+        })
+
+        await sheetsHandler.spreadsheets.values.update({
+            spreadsheetId: process.env.GOOGLE_SHEET_PRICE_PERFROMANCE_CALCUTION_SHEET_ID,
+            range: "Daily Units Details!A2",
+            valueInputOption: "RAW", // 或 "USER_ENTERED" 让 Sheets 按公式/日期识别
+            requestBody: { values: unitsDetails },
         })
     } catch (error) {
         console.log(error);

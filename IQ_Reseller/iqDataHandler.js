@@ -20,7 +20,7 @@ const handleAllItemsData = (allItems, masterItemsMap, processCostsMap, techPerfo
         if (!location || !inventoryComments) { continue; }
 
         // Get category
-        const {generalCategory, detailedCategory} = masterItemsMap.get(itemId);
+        const {generalCategory, detailedCategory} = masterItemsMap.get(itemId) || {generalCategory: "Other", detailedCategory: "Other"};
         const category = categorySet.has(generalCategory) ? generalCategory :
             categorySet.has(detailedCategory) ? detailedCategory : "Other";
 
@@ -30,6 +30,7 @@ const handleAllItemsData = (allItems, masterItemsMap, processCostsMap, techPerfo
             qcInitSummary, dailyWorkedOnUnits, processCostsMap, inventoryId, location, condition,
             PO, serialNumber, itemId
         );
+
     }
 
     // calculate the performance
@@ -124,7 +125,7 @@ const calculateTestingQCAmounts = (
 
             // calculate process cost
             try {
-                const [isDecal, isRepair, processCost] = calculateFinalCost(category, inventoryComments, processCostsMap, location);
+                const [, , processCost] = calculateFinalCost(category, inventoryComments, processCostsMap, location);
                 dailyWorkedOnUnits[inventoryId] = {
                     inventoryId,
                     PO,
@@ -170,7 +171,7 @@ const calculateTestingQCAmounts = (
                 location,
                 category,
                 inventoryComments,
-                progress: `Receiving => Testing => ${isRepair ? "Repair =>" : ''} QC => ${isDecal ? "Decal =>" : ''} => cleaning`,
+                progress: `Receiving => Testing => ${isRepair ? "Repair =>" : ''} QC => ${isDecal ? "Decal =>" : ''} cleaning`,
                 isFinalCost: true
             }
         }
@@ -186,7 +187,7 @@ const calculateFinalCost = (category, inventoryComments, processCostsMap, locati
     const decalCost = processCostsObj.decalCost;
     let totalPrice = Object.values(processCostsObj).reduce((acc, price) => acc + price, 0);
 
-    const isDecal = /repair/i.test(inventoryComments)
+    const isDecal = /decal/i.test(inventoryComments)
     const isRepair = /repair/i.test(inventoryComments)
 
     // calculate the final cost.

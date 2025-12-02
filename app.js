@@ -46,7 +46,7 @@ const main = async () => {
         // await updateUnitCost(priceUpdateRequiredUnitArr)
 
         // Update to Google Sheets
-        await tempWriteToGoogleSheets(techPerformanceResult, qcPerformanceResult, new Date(dataGeneratedTimeObj[0].time).toLocaleString());
+        await tempWriteToGoogleSheets(dailyWorkedOnUnits, techPerformanceResult, qcPerformanceResult, new Date(dataGeneratedTimeObj[0].time).toLocaleString());
 
         console.log(`FINISHED AT ${new Date().toLocaleString()}`)
     }
