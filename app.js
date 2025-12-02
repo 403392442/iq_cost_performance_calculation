@@ -17,36 +17,40 @@ const main = async () => {
     // STEP 1: Get data from MongoDB
     console.log(`<(￣︶￣)> Getting Data From MongoDB...`)
     const dataGeneratedTimeObj = await getTime()
-    if (dataGeneratedTimeObj[0].time === savedTime) {return}
-    savedTime = dataGeneratedTimeObj[0].time;
-    const allItems = await getInventories()
-    const allMasterItems = await getMasterItems()
-    const masterItemsMap = createMasterItemsMap(allMasterItems);
+    if (dataGeneratedTimeObj[0].time === savedTime) {
+        console.log(`Saved Time: ${savedTime} - Time in database ${dataGeneratedTimeObj[0].time}`);
+    } else {
+        savedTime = dataGeneratedTimeObj[0].time;
+        const allItems = await getInventories()
+        const allMasterItems = await getMasterItems()
+        const masterItemsMap = createMasterItemsMap(allMasterItems);
 
-    // STEP 2: Get data from Google Sheets
-    console.log(`ヽ(・∀・)ﾉ Getting Data From Google Sheets`)
-    const [
-        processCostsMap,
-        techPerformanceMap,
-        qcPerformanceMap
-    ] = await getAndCleanDataFromGoogle();
+        // STEP 2: Get data from Google Sheets
+        console.log(`ヽ(・∀・)ﾉ Getting Data From Google Sheets`)
+        const [
+            processCostsMap,
+            techPerformanceMap,
+            qcPerformanceMap
+        ] = await getAndCleanDataFromGoogle();
 
-    // Calculate cost & performance
-    const [
-        dailyWorkedOnUnits,
-        techPerformanceResult,
-        qcPerformanceResult,
-    ] = handleAllItemsData(allItems, masterItemsMap, processCostsMap, techPerformanceMap, qcPerformanceMap);
+        // Calculate cost & performance
+        const [
+            dailyWorkedOnUnits,
+            techPerformanceResult,
+            qcPerformanceResult,
+        ] = handleAllItemsData(allItems, masterItemsMap, processCostsMap, techPerformanceMap, qcPerformanceMap);
 
-    exportJson(dailyWorkedOnUnits);
+        exportJson(dailyWorkedOnUnits);
 
-    // Update the unit cost in IQ
-    // await updateUnitCost(priceUpdateRequiredUnitArr)
+        // Update the unit cost in IQ
+        // await updateUnitCost(priceUpdateRequiredUnitArr)
 
-    // Update to Google Sheets
-    await tempWriteToGoogleSheets(techPerformanceResult, qcPerformanceResult, new Date(dataGeneratedTimeObj[0].time).toLocaleString());
+        // Update to Google Sheets
+        await tempWriteToGoogleSheets(techPerformanceResult, qcPerformanceResult, new Date(dataGeneratedTimeObj[0].time).toLocaleString());
 
-    console.log(`FINISHED AT ${new Date().toLocaleString()}`)
+        console.log(`FINISHED AT ${new Date().toLocaleString()}`)
+    }
+
 
 }
 
