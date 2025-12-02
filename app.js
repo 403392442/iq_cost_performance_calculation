@@ -46,18 +46,16 @@ const main = async () => {
 
 }
 
-cron.schedule('0 9-17 * * 1-5', main);
+cron.schedule('0,30 9-17 * * 1-5', main, {
+    scheduled: true,
+});
 
-/**
- * TODO - make the process fully automatic
- */
 // top-level catcher so unhandled errors don’t crash silently
-// main().catch((err) => {
-//     console.error('Unexpected fatal error in main:', err);
-//     process.exit(1);
-// });
+main().catch((err) => {
+    console.error('Unexpected fatal error in main:', err);
+    process.exit(1);
+});
 
 
-main()
 
 
