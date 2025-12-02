@@ -50,7 +50,7 @@ const main = async () => {
 
 }
 
-cron.schedule('0,30 9-17 * * 1-5', main, {
+cron.schedule('0,10 9-17 * * 1-5', main, {
     scheduled: true,
 });
 
