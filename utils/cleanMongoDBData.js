@@ -2,8 +2,8 @@ const createMasterItemsMap = (masterItemsArr) => {
     const map = new Map();
     for (const masterItem of masterItemsArr) {
         map.set(masterItem.itemId, {
-            generalCategory: masterItem.generalCategory,
-            detailedCategory: masterItem.detailedCategory,
+            generalCategory: masterItem.generalCategory || "Other",
+            detailedCategory: masterItem.detailedCategory || "Other",
         });
     }
 

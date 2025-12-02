@@ -57,7 +57,6 @@ cron.schedule('0,10 9-17 * * 1-5', main, {
 // top-level catcher so unhandled errors don’t crash silently
 main().catch((err) => {
     console.error('Unexpected fatal error in main:', err);
-    process.exit(1);
 });
 
 

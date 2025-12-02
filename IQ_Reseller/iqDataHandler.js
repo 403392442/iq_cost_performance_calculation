@@ -105,7 +105,7 @@ const calculateTestingQCAmounts = (
     condition,
     PO,
     serialNumber,
-    itemId
+    itemId,
     ) => {
     const today = new Date();
 
@@ -133,6 +133,8 @@ const calculateTestingQCAmounts = (
                     condition,
                     processCost,
                     location,
+                    category,
+                    inventoryComments,
                     progress: "",
                     isFinalCost: false
                 }
@@ -166,6 +168,8 @@ const calculateTestingQCAmounts = (
                 condition,
                 processCost,
                 location,
+                category,
+                inventoryComments,
                 progress: `Receiving => Testing => ${isRepair ? "Repair =>" : ''} QC => ${isDecal ? "Decal =>" : ''} => cleaning`,
                 isFinalCost: true
             }
