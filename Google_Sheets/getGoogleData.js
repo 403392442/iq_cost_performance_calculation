@@ -1,7 +1,5 @@
 const getSheetsClient = require('./getGoogleSheetsClient');
 const {
-    GOOGLE_SHEET_MODE_LIST_RANGE,
-    GOOGLE_SHEET_UNFINISHED_PO_LIST_RANGE,
     GOOGLE_SHEET_PROCESS_COST_TABLE_RANGE,
     GOOGLE_SHEET_TECH_PERFORMANCE_TABLE_RANGE,
     GOOGLE_SHEET_QC_PERFORMANCE_TABLE_RANGE
@@ -16,39 +14,15 @@ const getGoogleData = async () => {
     const dailyReportSheetID = process.env.GOOGLE_SHEET_DAILY_REPORT_ID;
     const performanceCostSheetId = process.env.GOOGLE_SHEET_PERFORMANCE_COST_SHEET_ID;
 
-    if (!dailyReportSheetID || !GOOGLE_SHEET_MODE_LIST_RANGE) {
+    if (!dailyReportSheetID) {
         return {
             code: 500,
             message:
-                'GOOGLE_SHEET_DAILY_REPORT_ID or GOOGLE_SHEET_MODE_LIST_RANGE is not set in .env',
+                'GOOGLE_SHEET_DAILY_REPORT_ID is not set in .env',
         };
     }
 
     try {
-        const modelRes = await sheetsHandler.spreadsheets.values.get({
-            spreadsheetId: dailyReportSheetID,
-            range: GOOGLE_SHEET_MODE_LIST_RANGE,
-        });
-
-        const modelData = modelRes.data.values || [];
-        if (modelData.length === 0) {
-            return {
-                code: 204,
-                message: 'No modelData found in the MODEL LIST sheet.',
-            };
-        }
-        const PORes = await sheetsHandler.spreadsheets.values.get( {
-            spreadsheetId: dailyReportSheetID,
-            range: GOOGLE_SHEET_UNFINISHED_PO_LIST_RANGE,
-        })
-        const unfinishedPOData = PORes.data.values || [];
-        if (unfinishedPOData.length === 0) {
-            return {
-                code: 204,
-                message: 'No UnfinishedPOData found in the UNFINISHED PO sheet.',
-            };
-        }
-
         const processCostRes = await sheetsHandler.spreadsheets.values.get({
             spreadsheetId: performanceCostSheetId,
             range: GOOGLE_SHEET_PROCESS_COST_TABLE_RANGE,
@@ -88,8 +62,6 @@ const getGoogleData = async () => {
         return {
             code: 200,
             data: {
-                modelData,
-                unfinishedPOData,
                 processCostData,
                 techPerformanceData,
                 qcPerformanceData,

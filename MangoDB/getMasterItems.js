@@ -1,8 +1,8 @@
-const { connectToMongoDB, disconnectFromMongoDB } = require("./Connection/dataConnection");
-const IQInventory = require('./Models/IQInventoryModel')
+const MasterItem = require('./Models/MasterItemModel')
+const {connectToMongoDB, disconnectFromMongoDB} = require("./Connection/dataConnection");
 
-const getInventories = async () => {
-    console.log(`(^o^)丿 Getting Inventories`);
+const getMasterItems = async () => {
+    console.log(`(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ Getting Master Items`)
     const {status, message} = await connectToMongoDB();
     if (status !== 200) {
         console.error(message);
@@ -10,7 +10,7 @@ const getInventories = async () => {
     }
 
     try {
-        return await IQInventory.find({});
+        return await MasterItem.find({});
 
     } catch (error) {
         console.error("Error fetching items:", error);
@@ -22,5 +22,4 @@ const getInventories = async () => {
 
 }
 
-module.exports = getInventories;
-
+module.exports = getMasterItems;

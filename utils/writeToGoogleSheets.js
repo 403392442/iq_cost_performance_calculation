@@ -2,70 +2,25 @@ const dotenv = require('dotenv');
 const getSheetsClient = require("../Google_Sheets/getGoogleSheetsClient");
 dotenv.config();
 
-/**
- * GOAL: Desperate this function
- * @returns {Promise<void>}
- */
-const writeToGoogleSheets = async(priceUpdateRequiredUnit, techPerformanceResult, qcPerformanceResult) => {
+const writeToGoogleSheets = async(techPerformanceResult, qcPerformanceResult, time) => {
     const sheetsHandler = getSheetsClient();
     const today = new Date();
-    const date = (today.getMonth()+1) + "/" + today.getDate()  + "/" + today.getFullYear()
-    const time = today.getHours() + ":"  + today.getMinutes() + ":" + today.getSeconds();
+    const date = (today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear()
 
-    const priceSheetHeader = ["Inventory ID", "Purchase Cost", "Unit Cost", "Category", "Needs Repair", "Needs Decal"];
-    const testingPerformanceTableHeader = ["Tech Init", "Position", "Macbook", "iMac", "Mac Mini", "Mac Pro", "Mac Studio", "iPhone", "iPad", "Apple TV", "Monitor", "Apple Watch", "Apple Accessory", "Other", "Total Tested", "Performance"];
-    const qcPerformanceResultTableHeader = ["Tech Init", "Position", "Macbook", "iMac", "Mac Mini", "Mac Pro", "Mac Studio", "iPhone", "iPad", "Apple TV", "Monitor", "Apple Watch", "Apple Accessory", "Other", "Total QCed", "Performance"];
-
-    const techPerformanceData = Array.from(techPerformanceResult.entries()).map(([key, value]) => [
-        key,
-        value["Position"],
-        value["Macbook"],
-        value["iMac"],
-        value["Mac Mini"],
-        value["Mac Pro"],
-        value["Mac Studio"],
-        value["iPhone"],
-        value["iPad"],
-        value["Apple TV"],
-        value["Monitor"],
-        value["Apple Watch"],
-        value["Apple Accessory"],
-        value["Other"],
-        value["Total Tested"],
-        value["Performance"],
-    ]);
-
-    const qcPerformanceData = Array.from(qcPerformanceResult.entries()).map(([key, value]) => [
-        key,
-        value["Position"],
-        value["Macbook"],
-        value["iMac"],
-        value["Mac Mini"],
-        value["Mac Pro"],
-        value["Mac Studio"],
-        value["iPhone"],
-        value["iPad"],
-        value["Apple TV"],
-        value["Monitor"],
-        value["Apple Watch"],
-        value["Apple Accessory"],
-        value["Other"],
-        value["Total QCed"],
-        value["Performance"],
-    ]);
+    const [techPerformance, qcPerformance] = changePerformanceFormat(techPerformanceResult, qcPerformanceResult)
 
     const performanceReport = [
         {
             range: `${date}!A1`,
-            values: [[time]]
+            values: [[`${time}`]],
         },
         {
             range: `${date}!A3`,
-            values: [[...testingPerformanceTableHeader], ...techPerformanceData],
+            values: techPerformance,
         },
         {
-            range: `${date}!A${techPerformanceData.length + 5}`,
-            values: [[...qcPerformanceResultTableHeader], ...qcPerformanceData],
+            range: `${date}!A${techPerformance.length + 5}`,
+            values: qcPerformance,
         }
     ]
 
@@ -99,13 +54,6 @@ const writeToGoogleSheets = async(priceUpdateRequiredUnit, techPerformanceResult
             });
         }
 
-        await sheetsHandler.spreadsheets.values.update({
-            spreadsheetId: process.env.GOOGLE_SHEET_PRICE_PERFROMANCE_CALCUTION_SHEET_ID,
-            range: `Cost Calculation!A1`,
-            valueInputOption: "RAW",
-            requestBody: { values: [[...priceSheetHeader], ...priceUpdateRequiredUnit] },
-        });
-
         await sheetsHandler.spreadsheets.values.batchUpdate({
             spreadsheetId: process.env.GOOGLE_SHEET_PRICE_PERFROMANCE_CALCUTION_SHEET_ID,
             resource: {
@@ -117,6 +65,60 @@ const writeToGoogleSheets = async(priceUpdateRequiredUnit, techPerformanceResult
         console.log(error);
     }
 
+}
+
+const changePerformanceFormat = (techPerformanceResult, qcPerformanceResult) => {
+    let techPerformance;
+    let qcPerformance;
+
+    if (techPerformanceResult.size !== 0) {
+        const techName = [...techPerformanceResult.keys()][0];
+        const performanceReport = techPerformanceResult.get(techName);
+        const performanceContent = Object.keys(performanceReport);
+        techPerformance = performanceContent.map(item => [item])
+        performanceContent[performanceContent.length - 2] = "Total QCed";
+        qcPerformance = performanceContent.map(item => [item])
+    } else if (qcPerformanceResult.size !== 0) {
+        const techName = [...qcPerformanceResult.keys()][0];
+        const performanceReport = qcPerformanceResult.get(techName);
+        const performanceContent = Object.keys(performanceReport);
+        qcPerformance = performanceContent.map(item => [item])
+        performanceContent[performanceContent.length - 2] = "Total Tested";
+        techPerformance = performanceContent.map(item => [item])
+    }
+
+    if (techPerformanceResult.size !== 0) {
+        for (const techName of techPerformanceResult.keys()) {
+            const performanceReport = techPerformanceResult.get(techName);
+            for (const performanceRow of techPerformance) {
+                if (performanceRow[0] === "Position") {
+                    performanceRow.push("Testing Tech")
+                } else if (performanceRow[0] === "Name") {
+                    performanceRow.push(techName)
+                } else {
+                    const title = performanceRow[0]
+                    performanceRow.push(performanceReport[title])
+                }
+            }
+        }
+    }
+    if (qcPerformanceResult.size !== 0) {
+        for (const techName of qcPerformanceResult.keys()) {
+            const performanceReport = qcPerformanceResult.get(techName);
+            for (const performanceRow of qcPerformance) {
+                if (performanceRow[0] === "Position") {
+                    performanceRow.push("QC Tech")
+                } else if (performanceRow[0] === 'Name') {
+                    performanceRow.push(techName)
+                } else {
+                    const title = performanceRow[0]
+                    performanceRow.push(performanceReport[title])
+                }
+            }
+        }
+    }
+
+    return [techPerformance, qcPerformance]
 }
 
 module.exports = {

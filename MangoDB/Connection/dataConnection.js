@@ -6,10 +6,7 @@ const mongodbAddress = process.env.MONGODB_ADDRESS;
 
 const connectToMongoDB = async () => {
     try {
-        await mongoose.connect(mongodbAddress, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+        await mongoose.connect(mongodbAddress);
         return {
             status: 200,
             message: 'Connected to MongoDB!',

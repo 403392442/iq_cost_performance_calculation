@@ -1,13 +1,3 @@
-const { GOOGLE_SHEET_PERFORMANCE_TABLE_COLUMN_NAME_ARRAY } = require('../utils/constants');
-
-const cleanUnfinishedPOData = (poData) => {
-    const tempSet = new Set();
-    for (const poNumber of poData.flat()) {
-        tempSet.add(poNumber.trim());
-    }
-    return [...tempSet];
-}
-
 const cleanProcessCostData = (table) => {
     const costMap = new Map();
     const typeSet = new Set();
@@ -26,7 +16,7 @@ const cleanProcessCostData = (table) => {
             shippingCost
         ] = row;
 
-        costMap.set(type, {
+        costMap.set(type.trim(), {
             "receivingCost": parseFloat(receivingCost) || 0,
             "testingCost": parseFloat(testingCost) || 0,
             "qcCost": parseFloat(qcCost) || 0,
@@ -37,32 +27,32 @@ const cleanProcessCostData = (table) => {
             "repairCost": parseFloat(repairCost) || 0,
             "shippingCost": parseFloat(shippingCost) || 0
         });
-
-        typeSet.add(type);
+        typeSet.add(type.trim());
     }
     return [costMap, typeSet];
 }
 
-const cleanPerformanceData = (techPerformanceData, qcPerformanceData) => {
+const cleanPerformanceData = (techPerformanceData, qcPerformanceData, typeSet) => {
     const techPerformanceMap = new Map();
     const qcPerformanceMap = new Map();
+    const typeSetDuplication = new Set([...typeSet]);
 
-    for (let i = 0; i < techPerformanceData.length; i++) {
-        const techGoal = techPerformanceData[i];
-        const qcGoal = qcPerformanceData[i];
-        /**
-         * TODO
-         * get the column names from the axios returned data
-         * now the program is using the static data in the constants.js
-         */
-        const type = GOOGLE_SHEET_PERFORMANCE_TABLE_COLUMN_NAME_ARRAY[i];
+    if (techPerformanceData[0].length !== qcPerformanceData[0].length) {
+        console.log(`The length of tech performance data doesn't equal to the qc performance data.`);
+        process.exit(2)
+    }
 
-        if (!techGoal || !qcGoal) {
-            console.error(`tech performance or qc performance table has empty field in ${type} column`);
-        }
+    for (let i = 0; i < techPerformanceData[0].length; i++) {
+        techPerformanceMap.set(techPerformanceData[0][i].trim(), parseFloat(techPerformanceData[1][i]));
+        qcPerformanceMap.set(qcPerformanceData[0][i].trim(), parseFloat(qcPerformanceData[1][i]));
 
-        techPerformanceMap.set(type, techGoal || 1);
-        qcPerformanceMap.set(type, qcGoal || 1);
+        typeSet.delete(techPerformanceData[0][i]);
+        typeSetDuplication.delete(techPerformanceData[0][i]);
+    }
+
+    if (typeSet.size > 0 || typeSetDuplication.size > 0) {
+        console.error(`Check the categories in the performance table, make sure the consistency of categories in the performance table and process cost table are the same.`);
+        process.exit(2);
     }
 
     return [techPerformanceMap, qcPerformanceMap];
@@ -70,7 +60,6 @@ const cleanPerformanceData = (techPerformanceData, qcPerformanceData) => {
 
 
 module.exports = {
-    cleanUnfinishedPOData,
     cleanProcessCostData,
     cleanPerformanceData,
 }

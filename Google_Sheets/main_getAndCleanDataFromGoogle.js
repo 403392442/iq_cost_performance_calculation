@@ -1,33 +1,30 @@
 const getGoogleData = require("./getGoogleData");
-const {cleanProcessCostData, cleanUnfinishedPOData, cleanPerformanceData} = require("./googleDataHandler");
+const { cleanProcessCostData, cleanPerformanceData } = require("./googleDataHandler");
 
 const getAndCleanDataFromGoogle = async () => {
     const googleData = await getGoogleData();
     if (googleData.code !== 200) {
         console.error(`Error in getGoogleData:\n${googleData.message}`);
-        return;
+        process.exit(2);
     }
     const {
-        unfinishedPOData,
         processCostData,
         techPerformanceData,
         qcPerformanceData
     } = googleData.data;
 
-    const [processCostsMap, processCostsTableTypesSet] = cleanProcessCostData(processCostData);
-    if (processCostsMap.size === 0) {
-        console.error(`Error in getGoogleData:\nNo process costs found.`);
-        return;
-    }
-    const workingOnPOData = cleanUnfinishedPOData(unfinishedPOData);
-    if (workingOnPOData.length === 0) {
-        console.error(`Error in getGoogleData:\nNo working on PO data found.`);
-        return;
+    const [processCostsMap, typeSet] = cleanProcessCostData(processCostData);
+    const [techPerformanceMap, qcPerformanceMap] = cleanPerformanceData(techPerformanceData, qcPerformanceData, typeSet);
+
+    if (processCostsMap.size === 0 || techPerformanceMap.size === 0 || qcPerformanceMap.size === 0 || typeSet.size !== 0) {
+        console.error(
+            `Error in getGoogleData:\nNo process costs or performance data found.\n
+            Process Data Length: ${processCostsMap.size}. Tech Performance Data Length: ${techPerformanceMap.size}. QC Performance Data Length: ${qcPerformanceMap.size}.`
+        );
+        process.exit(2);
     }
 
-    const [techPerformanceMap, qcPerformanceMap] = cleanPerformanceData(techPerformanceData.flat(), qcPerformanceData.flat());
-
-    return [processCostsMap, workingOnPOData, techPerformanceMap, qcPerformanceMap];
+    return [processCostsMap, techPerformanceMap, qcPerformanceMap];
 }
 
 module.exports = getAndCleanDataFromGoogle;

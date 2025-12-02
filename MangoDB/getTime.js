@@ -1,8 +1,8 @@
-const { connectToMongoDB, disconnectFromMongoDB } = require("./Connection/dataConnection");
-const IQInventory = require('./Models/IQInventoryModel')
+const Time = require('./Models/TimeModel')
+const {connectToMongoDB, disconnectFromMongoDB} = require("./Connection/dataConnection");
 
-const getInventories = async () => {
-    console.log(`(^o^)丿 Getting Inventories`);
+const getTime = async () => {
+    console.log(`(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ Getting Time`)
     const {status, message} = await connectToMongoDB();
     if (status !== 200) {
         console.error(message);
@@ -10,7 +10,7 @@ const getInventories = async () => {
     }
 
     try {
-        return await IQInventory.find({});
+        return await Time.find({});
 
     } catch (error) {
         console.error("Error fetching items:", error);
@@ -22,5 +22,4 @@ const getInventories = async () => {
 
 }
 
-module.exports = getInventories;
-
+module.exports = getTime;

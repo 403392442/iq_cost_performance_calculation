@@ -6,5 +6,5 @@ const MasterItemSchema = new mongoose.Schema({
     detailedCategory: {type: String},
 })
 
-module.exports = mongoose.model('IQInventory', MasterItemSchema, 'masteritems');
+module.exports = mongoose.model('MasterItem', MasterItemSchema, 'masteritems');
 

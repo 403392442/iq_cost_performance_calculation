@@ -3,10 +3,7 @@ const getAllInventories = require("./getAllInventories");
 
 
 /**
- * TODO
- * Error handling
- * Save in a separate file
- * for both getDataFormIQ & getAndCleanDataFromGoogle
+ * TODO - delete
  */
 const getDataFromIQ = async (workingOnPOData) => {
     // 1) Get session token
