@@ -9,13 +9,17 @@ const {createMasterItemsMap} = require('./utils/cleanMongoDBData')
 const exportJson = require("./utils/exportJson");
 const getTime = require("./MangoDB/getTime");
 
+let savedTime = '';
+
 const main = async () => {
     console.log('(´｡ • ω •｡ \\\\) Running main at', new Date().toLocaleString());
 
     // STEP 1: Get data from MongoDB
     console.log(`<(￣︶￣)> Getting Data From MongoDB...`)
-    const allItems = await getInventories()
     const dataGeneratedTimeObj = await getTime()
+    if (dataGeneratedTimeObj[0].time === savedTime) {return}
+    savedTime = dataGeneratedTimeObj[0].time;
+    const allItems = await getInventories()
     const allMasterItems = await getMasterItems()
     const masterItemsMap = createMasterItemsMap(allMasterItems);
 
