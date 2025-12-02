@@ -63,6 +63,11 @@ const writeToGoogleSheets = async(dailyWorkedOnUnits, techPerformanceResult, qcP
             }
         })
 
+        await sheetsHandler.spreadsheets.values.clear({
+            spreadsheetId: process.env.GOOGLE_SHEET_PRICE_PERFROMANCE_CALCUTION_SHEET_ID,
+            range: `Daily Units Details!A2`, // adjust range as needed
+        });
+
         await sheetsHandler.spreadsheets.values.update({
             spreadsheetId: process.env.GOOGLE_SHEET_PRICE_PERFROMANCE_CALCUTION_SHEET_ID,
             range: "Daily Units Details!A2",
