@@ -2,8 +2,7 @@ const dotenv = require('dotenv');
 const getSheetsClient = require("../Google_Sheets/getGoogleSheetsClient");
 dotenv.config();
 
-const writeToGoogleSheets = async(dailyWorkedOnUnits, techPerformanceResult, qcPerformanceResult, time) => {
-    const unitsDetails = Object.values(dailyWorkedOnUnits).map(Object.values)
+const writeToGoogleSheets = async(unitsDetails, techPerformanceResult, qcPerformanceResult, time) => {
     const sheetsHandler = getSheetsClient();
     const today = new Date();
     const date = (today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear()

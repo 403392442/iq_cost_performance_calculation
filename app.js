@@ -8,6 +8,7 @@ const getMasterItems = require("./MangoDB/getMasterItems");
 const {createMasterItemsMap} = require('./utils/cleanMongoDBData')
 const exportJson = require("./utils/exportJson");
 const getTime = require("./MangoDB/getTime");
+const updateDailyWorkedOnUnits = require("./MangoDB/updateDailyWorkedOnUnits");
 
 let savedTime = '';
 
@@ -39,14 +40,16 @@ const main = async () => {
             techPerformanceResult,
             qcPerformanceResult,
         ] = handleAllItemsData(allItems, masterItemsMap, processCostsMap, techPerformanceMap, qcPerformanceMap);
+        const unitsDetails = Object.values(dailyWorkedOnUnits).map(Object.values)
 
+        await updateDailyWorkedOnUnits(dailyWorkedOnUnits)
         exportJson(dailyWorkedOnUnits);
 
         // Update the unit cost in IQ
         // await updateUnitCost(priceUpdateRequiredUnitArr)
 
         // Update to Google Sheets
-        await tempWriteToGoogleSheets(dailyWorkedOnUnits, techPerformanceResult, qcPerformanceResult, new Date(dataGeneratedTimeObj[0].time).toLocaleString());
+        await tempWriteToGoogleSheets(unitsDetails, techPerformanceResult, qcPerformanceResult, new Date(dataGeneratedTimeObj[0].time).toLocaleString());
 
         console.log(`FINISHED AT ${new Date().toLocaleString()}`)
     }
