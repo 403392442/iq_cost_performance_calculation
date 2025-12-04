@@ -1,3 +1,7 @@
+const filterRowInventoryData = (rowInventoryData) => {
+    return rowInventoryData.filter(inventory => {inventory.inventorycomments})
+}
+
 const handleAllItemsData = (allItems, masterItemsMap, processCostsMap, techPerformanceMap, qcPerformanceMap) => {
     console.log("Start Handling Inventories Data");
     const dailyWorkedOnUnits = {};
@@ -9,26 +13,26 @@ const handleAllItemsData = (allItems, masterItemsMap, processCostsMap, techPerfo
 
     for (const item of allItems) {
         const {
-            inventoryComments,
-            itemId,
+            inventorycomments,
+            itemid,
             location,
-            inventoryId,
+            inventoryid,
             condition,
             PO,
-            serialNumber,
+            serialnumber,
         } = item;
-        if (!location || !inventoryComments) { continue; }
+        if (!location || !inventorycomments) { continue; }
 
         // Get category
-        const {generalCategory, detailedCategory} = masterItemsMap.get(itemId) || {generalCategory: "Other", detailedCategory: "Other"};
-        const category = categorySet.has(generalCategory) ? generalCategory :
-            categorySet.has(detailedCategory) ? detailedCategory : "Other";
+        const {generalCategory, detailedCategory} = masterItemsMap.get(itemid) || {generalCategory: "Other", detailedCategory: "Other"};
+        const category = categorySet.has(generalCategory.toLowerCase()) ? generalCategory :
+            categorySet.has(detailedCategory.toLowerCase()) ? detailedCategory : "Other";
 
         // Calculate the tech performance
         calculateTestingQCAmounts(
-            category, inventoryComments, techPerformanceResult, qcPerformanceResult, techInitSummary,
-            qcInitSummary, dailyWorkedOnUnits, processCostsMap, inventoryId, location, condition,
-            PO, serialNumber, itemId
+            category, inventorycomments, techPerformanceResult, qcPerformanceResult, techInitSummary,
+            qcInitSummary, dailyWorkedOnUnits, processCostsMap, inventoryid, location, condition,
+            PO, serialnumber, itemid
         );
 
     }

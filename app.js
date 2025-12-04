@@ -9,50 +9,42 @@ const {createMasterItemsMap} = require('./utils/cleanMongoDBData')
 const exportJson = require("./utils/exportJson");
 const getTime = require("./MangoDB/getTime");
 const updateDailyWorkedOnUnits = require("./MangoDB/updateDailyWorkedOnUnits");
-
-let savedTime = '';
+const getAllInventories = require("./IQ_Reseller/getAllInventories");
 
 const main = async () => {
     console.log('(´｡ • ω •｡ \\\\) Running main at', new Date().toLocaleString());
+    const allRowInventories = await getAllInventories();
+    const allItems = allRowInventories.filter(inventory => inventory.inventorycomments !== "")
 
-    // STEP 1: Get data from MongoDB
-    console.log(`<(￣︶￣)> Getting Data From MongoDB...`)
-    const dataGeneratedTimeObj = await getTime()
-    if (dataGeneratedTimeObj[0].time === savedTime) {
-        console.log(`Saved Time: ${savedTime} - Time in database ${dataGeneratedTimeObj[0].time}`);
-    } else {
-        savedTime = dataGeneratedTimeObj[0].time;
-        const allItems = await getInventories()
-        const allMasterItems = await getMasterItems()
-        const masterItemsMap = createMasterItemsMap(allMasterItems);
+    const allMasterItems = await getMasterItems()
+    const masterItemsMap = createMasterItemsMap(allMasterItems);
 
-        // STEP 2: Get data from Google Sheets
-        console.log(`ヽ(・∀・)ﾉ Getting Data From Google Sheets`)
-        const [
-            processCostsMap,
-            techPerformanceMap,
-            qcPerformanceMap
-        ] = await getAndCleanDataFromGoogle();
+    // STEP 2: Get data from Google Sheets
+    console.log(`ヽ(・∀・)ﾉ Getting Data From Google Sheets`)
+    const [
+        processCostsMap,
+        techPerformanceMap,
+        qcPerformanceMap
+    ] = await getAndCleanDataFromGoogle();
 
-        // Calculate cost & performance
-        const [
-            dailyWorkedOnUnits,
-            techPerformanceResult,
-            qcPerformanceResult,
-        ] = handleAllItemsData(allItems, masterItemsMap, processCostsMap, techPerformanceMap, qcPerformanceMap);
-        const unitsDetails = Object.values(dailyWorkedOnUnits).map(Object.values)
+    // Calculate cost & performance
+    const [
+        dailyWorkedOnUnits,
+        techPerformanceResult,
+        qcPerformanceResult,
+    ] = handleAllItemsData(allItems, masterItemsMap, processCostsMap, techPerformanceMap, qcPerformanceMap);
+    const unitsDetails = Object.values(dailyWorkedOnUnits).map(Object.values)
 
-        await updateDailyWorkedOnUnits(dailyWorkedOnUnits)
-        exportJson(dailyWorkedOnUnits);
+    await updateDailyWorkedOnUnits(dailyWorkedOnUnits)
+    exportJson(dailyWorkedOnUnits);
 
-        // Update the unit cost in IQ
-        // await updateUnitCost(priceUpdateRequiredUnitArr)
+    // Update the unit cost in IQ
+    // await updateUnitCost(priceUpdateRequiredUnitArr)
 
-        // Update to Google Sheets
-        await tempWriteToGoogleSheets(unitsDetails, techPerformanceResult, qcPerformanceResult, new Date(dataGeneratedTimeObj[0].time).toLocaleString());
+    // Update to Google Sheets
+    await tempWriteToGoogleSheets(unitsDetails, techPerformanceResult, qcPerformanceResult, new Date(dataGeneratedTimeObj[0].time).toLocaleString());
 
-        console.log(`FINISHED AT ${new Date().toLocaleString()}`)
-    }
+    console.log(`FINISHED AT ${new Date().toLocaleString()}`)
 
 
 }

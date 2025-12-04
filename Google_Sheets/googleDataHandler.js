@@ -16,7 +16,7 @@ const cleanProcessCostData = (table) => {
             shippingCost
         ] = row;
 
-        costMap.set(type.trim(), {
+        costMap.set(type.trim().toLowerCase(), {
             "receivingCost": parseFloat(receivingCost) || 0,
             "testingCost": parseFloat(testingCost) || 0,
             "qcCost": parseFloat(qcCost) || 0,

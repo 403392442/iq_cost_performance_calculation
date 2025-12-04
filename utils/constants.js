@@ -6,7 +6,9 @@ const GOOGLE_SHEET_QC_PERFORMANCE_TABLE_RANGE = "Team Estimates!A18:M19";
 
 const IQ_API_SESSION_URL = "https://signin.iqreseller.com/api/IntegrationAPI/Session";
 const IQ_GET_INVENTORIES_BY_PO_ULR = 'https://api.iqreseller.com/webapi.svc/Inventory/JSON/GetInventoriesByPOId';
-const IQ_GET_INVENTORIES_BY_PAGE="https://api.iqreseller.com/webapi.svc/Inventory/XML/GetInventories";
+const IQ_GET_INVENTORIES_BY_PAGE_URL="https://api.iqreseller.com/webapi.svc/Inventory/JSON/GetInventories";
+const IQ_GET_INVENTORIES_COUNT_URL = "https://api.iqreseller.com/webapi.svc/Inventory/GetInventoriesCount"
+const IQ_GET_INVENTORIES_PAGE_SIZE = 2000; // 2000 is the maximum
 
 module.exports = {
     GOOGLE_AUTH_SCOPE,
@@ -16,5 +18,7 @@ module.exports = {
     GOOGLE_SHEET_QC_PERFORMANCE_TABLE_RANGE,
     IQ_API_SESSION_URL,
     IQ_GET_INVENTORIES_BY_PO_ULR,
-    IQ_GET_INVENTORIES_BY_PAGE,
+    IQ_GET_INVENTORIES_BY_PAGE_URL,
+    IQ_GET_INVENTORIES_COUNT_URL,
+    IQ_GET_INVENTORIES_PAGE_SIZE
 }
