@@ -1,7 +1,3 @@
-const filterRowInventoryData = (rowInventoryData) => {
-    return rowInventoryData.filter(inventory => {inventory.inventorycomments})
-}
-
 const handleAllItemsData = (allItems, masterItemsMap, processCostsMap, techPerformanceMap, qcPerformanceMap) => {
     console.log("Start Handling Inventories Data");
     const dailyWorkedOnUnits = {};
@@ -18,7 +14,7 @@ const handleAllItemsData = (allItems, masterItemsMap, processCostsMap, techPerfo
             location,
             inventoryid,
             condition,
-            PO,
+            poid,
             serialnumber,
         } = item;
         if (!location || !inventorycomments) { continue; }
@@ -32,7 +28,7 @@ const handleAllItemsData = (allItems, masterItemsMap, processCostsMap, techPerfo
         calculateTestingQCAmounts(
             category, inventorycomments, techPerformanceResult, qcPerformanceResult, techInitSummary,
             qcInitSummary, dailyWorkedOnUnits, processCostsMap, inventoryid, location, condition,
-            PO, serialnumber, itemid
+            poid, serialnumber, itemid
         );
 
     }
@@ -186,7 +182,7 @@ const calculateFinalCost = (category, inventoryComments, processCostsMap, locati
     if (location === "RTV") {return [false, false, 0];}
 
     // calculate cost
-    const processCostsObj = processCostsMap.get(category);
+    const processCostsObj = processCostsMap.get(category.toLowerCase());
     const repairCost = processCostsObj.repairCost;
     const decalCost = processCostsObj.decalCost;
     let totalPrice = Object.values(processCostsObj).reduce((acc, price) => acc + price, 0);
