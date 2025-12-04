@@ -6,6 +6,8 @@ const getApiKey = require("./getAPIKey");
 const getAllInventories = async () => {
     let apiKey;
     let totalInventoryCount;
+
+    console.log("Getting all inventories from IQ.")
     try {
         const apiKeyRes = await getApiKey()
         if (apiKeyRes.code === 200) {
@@ -46,10 +48,8 @@ const getAllInventories = async () => {
             })
         );
 
-        // execute all requests at once
         const responses = await Promise.all(requests);
 
-        // combine all the results
         return responses.flatMap((res) => res.data);
 
     } catch (e) {

@@ -10,15 +10,14 @@ const updateDailyWorkedOnUnits = require("./MangoDB/updateDailyWorkedOnUnits");
 const getAllInventories = require("./IQ_Reseller/getAllInventories");
 
 const main = async () => {
-    console.log('(´｡ • ω •｡ \\\\) Running main at', new Date().toLocaleString());
+    console.log('(•̀ᴗ•́)و ̑̑  Running main at', new Date().toLocaleString());
+    console.log('Getting Data from IQ and Mongodb  ( •̀ ω •́ )✧ ')
     const allRowInventories = await getAllInventories();
     const allItems = allRowInventories.filter(inventory => inventory.inventorycomments !== "")
-
     const allMasterItems = await getMasterItems()
     const masterItemsMap = createMasterItemsMap(allMasterItems);
 
-    // STEP 2: Get data from Google Sheets
-    console.log(`ヽ(・∀・)ﾉ Getting Data From Google Sheets`)
+    console.log(`Cleaning up data. (｀･ω･´)ゞ `)
     const [
         processCostsMap,
         techPerformanceMap,
@@ -26,6 +25,7 @@ const main = async () => {
     ] = await getAndCleanDataFromGoogle();
 
     // Calculate cost & performance
+    console.log('Calculate cost and performance (ಠ_ಠ)')
     const [
         dailyWorkedOnUnits,
         techPerformanceResult,
@@ -33,10 +33,12 @@ const main = async () => {
     ] = handleAllItemsData(allItems, masterItemsMap, processCostsMap, techPerformanceMap, qcPerformanceMap);
     const unitsDetails = Object.values(dailyWorkedOnUnits).map(Object.values)
 
+    console.log('Update MongoDB (╬ Ò ‸ Ó)')
     await updateDailyWorkedOnUnits(dailyWorkedOnUnits)
     exportJson(dailyWorkedOnUnits);
 
     // Update to Google Sheets
+    console.log('Update google sheets (っ- ‸ – ς)  ')
     await tempWriteToGoogleSheets(unitsDetails, techPerformanceResult, qcPerformanceResult, new Date().toLocaleString());
 
     console.log(`FINISHED AT ${new Date().toLocaleString()}`)
