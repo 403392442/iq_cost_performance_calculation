@@ -5,16 +5,20 @@ const updateDailyWorkedOnUnits = async (dailyWorkedOnUnits) => {
     const {status, message} = await connectToMongoDB();
     if (status !== 200) {
         console.error(message);
-        process.exit(1);
     }
 
     try {
-        await DailyWorkedOnUnit.deleteMany({})
-        await DailyWorkedOnUnit.insertMany(Object.values(dailyWorkedOnUnits));
+        const operations = Object.values(dailyWorkedOnUnits).map((item) => ({
+            updateOne: {
+                filter: { inventoryId: item.inventoryId },
+                update: { $set: item },
+                upsert: true,
+            },
+        }));
+        await DailyWorkedOnUnit.bulkWrite(operations);
 
     } catch (error) {
         console.error("Error fetching items:", error);
-        process.exit(1);
     } finally
     {
         await disconnectFromMongoDB();

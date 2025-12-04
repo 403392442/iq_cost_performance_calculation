@@ -3,11 +3,9 @@ const cron = require('node-cron')
 const {handleAllItemsData} = require('./IQ_Reseller/iqDataHandler')
 const {tempWriteToGoogleSheets} = require('./utils/writeToGoogleSheets');
 const getAndCleanDataFromGoogle = require('./Google_Sheets/main_getAndCleanDataFromGoogle')
-const getInventories = require('./MangoDB/getAllInventories')
 const getMasterItems = require("./MangoDB/getMasterItems");
 const {createMasterItemsMap} = require('./utils/cleanMongoDBData')
 const exportJson = require("./utils/exportJson");
-const getTime = require("./MangoDB/getTime");
 const updateDailyWorkedOnUnits = require("./MangoDB/updateDailyWorkedOnUnits");
 const getAllInventories = require("./IQ_Reseller/getAllInventories");
 
@@ -37,9 +35,6 @@ const main = async () => {
 
     await updateDailyWorkedOnUnits(dailyWorkedOnUnits)
     exportJson(dailyWorkedOnUnits);
-
-    // Update the unit cost in IQ
-    // await updateUnitCost(priceUpdateRequiredUnitArr)
 
     // Update to Google Sheets
     await tempWriteToGoogleSheets(unitsDetails, techPerformanceResult, qcPerformanceResult, new Date().toLocaleString());
