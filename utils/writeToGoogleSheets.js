@@ -64,13 +64,13 @@ const writeToGoogleSheets = async(unitsDetails, techPerformanceResult, qcPerform
 
         await sheetsHandler.spreadsheets.values.clear({
             spreadsheetId: process.env.GOOGLE_SHEET_PRICE_PERFROMANCE_CALCUTION_SHEET_ID,
-            range: `Daily Units Details!A2`, // adjust range as needed
+            range: `Daily Units Details!A2:K`,
         });
 
         await sheetsHandler.spreadsheets.values.update({
             spreadsheetId: process.env.GOOGLE_SHEET_PRICE_PERFROMANCE_CALCUTION_SHEET_ID,
             range: "Daily Units Details!A2",
-            valueInputOption: "RAW", // 或 "USER_ENTERED" 让 Sheets 按公式/日期识别
+            valueInputOption: "RAW",
             requestBody: { values: unitsDetails },
         })
     } catch (error) {

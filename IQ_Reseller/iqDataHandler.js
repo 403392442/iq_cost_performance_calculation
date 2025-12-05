@@ -20,9 +20,9 @@ const handleAllItemsData = (allItems, masterItemsMap, processCostsMap, techPerfo
         if (!location || !inventorycomments) { continue; }
 
         // Get category
-        const {generalCategory, detailedCategory} = masterItemsMap.get(itemid) || {generalCategory: "Other", detailedCategory: "Other"};
+        const {generalCategory, detailedCategory} = masterItemsMap.get(itemid) || {generalCategory: "other", detailedCategory: "other"};
         const category = categorySet.has(generalCategory.toLowerCase()) ? generalCategory :
-            categorySet.has(detailedCategory.toLowerCase()) ? detailedCategory : "Other";
+            categorySet.has(detailedCategory.toLowerCase()) ? detailedCategory : "other";
 
         // Calculate the tech performance
         calculateTestingQCAmounts(
