@@ -179,7 +179,7 @@ const calculateTestingQCAmounts = (
 }
 
 const calculateFinalCost = (category, inventoryComments, processCostsMap, location) => {
-    if (location === "RTV") {return [false, false, 0];}
+    if (location.trim() === "RTV") {return [false, false, 0];}
 
     // calculate cost
     const processCostsObj = processCostsMap.get(category.toLowerCase());
