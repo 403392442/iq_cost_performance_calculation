@@ -110,57 +110,114 @@ const calculateTestingQCAmounts = (
     ) => {
     const today = new Date();
 
-    // Match all TESTING DONE entries
-    const testingMatches = [...inventoryComments.matchAll(/TESTING DONE(?:.*?-)?\s*([A-Z]{1,4}):\s*(.+)/gi)];
-    for (const match of testingMatches) {
-        const techName = match[1];
-        const date = new Date(match[2]);
+    // const techEscapedKeyword = "TESTING DONE".replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // const techRegex = new RegExp(
+    //     techEscapedKeyword +
+    //     '\\s*-?\\s*' +
+    //     '([A-Za-z0-9]+)' +
+    //     '\\s*:\\s*' +
+    //     '([^\\n]+)',
+    //     'gi'
+    // );
+    //
+    // // Match all TESTING DONE entries
+    // const testingMatches = inventoryComments.match(techRegex);
+    // if (testingMatches) {
+    //     for (const match of testingMatches) {
+    //         const techName = match[1].trim();
+    //         const date = new Date(match[2].trim());
+    //
+    //         if (isSameDay(date, today)) {
+    //             if (!techPerformanceResult.has(techName)) { techPerformanceResult.set(techName, techInitSummary); }
+    //
+    //             const techDailyData = {...techPerformanceResult.get(techName)}
+    //             techDailyData[category] += 1;
+    //             techPerformanceResult.set(techName, techDailyData);
+    //
+    //             const [, , processCost] = calculateFinalCost(category, inventoryComments, processCostsMap, location);
+    //             dailyWorkedOnUnits[inventoryId] = {
+    //                 inventoryId,
+    //                 PO,
+    //                 serialNumber,
+    //                 itemId,
+    //                 condition,
+    //                 processCost,
+    //                 location,
+    //                 category,
+    //                 inventoryComments,
+    //                 progress: "",
+    //                 isFinalCost: false
+    //             }
+    //
+    //         }
+    //     }
+    // }
+    //
+    //
+    // const qcEscapedKeyword = "TESTING DONE".replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // const qcRegex = new RegExp(
+    //     qcEscapedKeyword +
+    //     '\\s*-?\\s*' +
+    //     '([A-Za-z0-9]+)' +
+    //     '\\s*:\\s*' +
+    //     '([^\\n]+)',
+    //     'gi'
+    // );
+    //
+    // // Match all QC DONE entries
+    // const qcMatches = inventoryComments.match(qcRegex);
+    // if (qcMatches) {
+    //     for (const match of qcMatches) {
+    //         const techName = match[1];
+    //         const date = new Date(match[2]);
+    //
+    //         if (isSameDay(date, today)) {
+    //             if (!qcPerformanceResult.has(techName)) { qcPerformanceResult.set(techName, qcInitSummary); }
+    //
+    //             const qcDailyData = {...qcPerformanceResult.get(techName)};
+    //             qcDailyData[category] += 1;
+    //             qcPerformanceResult.set(techName, qcDailyData);
+    //
+    //             // calculate process cost
+    //             const [isDecal, isRepair, processCost] = calculateFinalCost(category, inventoryComments, processCostsMap, location);
+    //             dailyWorkedOnUnits[inventoryId] = {
+    //                 inventoryId,
+    //                 PO,
+    //                 serialNumber,
+    //                 itemId,
+    //                 condition,
+    //                 processCost,
+    //                 location,
+    //                 category,
+    //                 inventoryComments,
+    //                 progress: `Receiving => Testing => ${isRepair ? "Repair =>" : ''} QC => ${isDecal ? "Decal =>" : ''} Cleaning`,
+    //                 isFinalCost: true
+    //             }
+    //         }
+    //     }
+    // }
+
+    const testingEvents = extractEvents(inventoryComments, "TESTING DONE");
+
+    for (const ev of testingEvents) {
+        const { techName, date } = ev;
 
         if (isSameDay(date, today)) {
-            if (!techPerformanceResult.has(techName)) { techPerformanceResult.set(techName, techInitSummary); }
+            if (!techPerformanceResult.has(techName)) {
+                techPerformanceResult.set(techName, { ...techInitSummary });
+            }
 
-            const techDailyData = {...techPerformanceResult.get(techName)}
+            const techDailyData = { ...techPerformanceResult.get(techName) };
             techDailyData[category] += 1;
             techPerformanceResult.set(techName, techDailyData);
 
-            // calculate process cost
-            try {
-                const [, , processCost] = calculateFinalCost(category, inventoryComments, processCostsMap, location);
-                dailyWorkedOnUnits[inventoryId] = {
-                    inventoryId,
-                    PO,
-                    serialNumber,
-                    itemId,
-                    condition,
-                    processCost,
-                    location,
-                    category,
-                    inventoryComments,
-                    progress: "",
-                    isFinalCost: false
-                }
-            } catch (e) {
-                console.log(inventoryId);
-            }
+            const [, , processCost] = calculateFinalCost(
+                category,
+                inventoryComments,
+                processCostsMap,
+                location
+            );
 
-        }
-    }
-
-    // Match all QC DONE entries
-    const qcMatches = [...inventoryComments.matchAll(/QC DONE(?:.*?-)?\s*([A-Z]{1,4}):\s*(.+)/gi)];
-    for (const match of qcMatches) {
-        const techName = match[1];
-        const date = new Date(match[2]);
-
-        if (isSameDay(date, today)) {
-            if (!qcPerformanceResult.has(techName)) { qcPerformanceResult.set(techName, qcInitSummary); }
-
-            const qcDailyData = {...qcPerformanceResult.get(techName)};
-            qcDailyData[category] += 1;
-            qcPerformanceResult.set(techName, qcDailyData);
-
-            // calculate process cost
-            const [isDecal, isRepair, processCost] = calculateFinalCost(category, inventoryComments, processCostsMap, location);
             dailyWorkedOnUnits[inventoryId] = {
                 inventoryId,
                 PO,
@@ -171,12 +228,122 @@ const calculateTestingQCAmounts = (
                 location,
                 category,
                 inventoryComments,
-                progress: `Receiving => Testing => ${isRepair ? "Repair =>" : ''} QC => ${isDecal ? "Decal =>" : ''} cleaning`,
-                isFinalCost: true
+                progress: "",
+                isFinalCost: false
+            };
+        }
+    }
+
+// QC DONE
+    const qcEvents = extractEvents(inventoryComments, "QC DONE");
+
+    for (const ev of qcEvents) {
+        const {techName, date} = ev;
+
+        if (isSameDay(date, today)) {
+            if (!qcPerformanceResult.has(techName)) {
+                qcPerformanceResult.set(techName, {...qcInitSummary});
             }
+
+            const qcDailyData = {...qcPerformanceResult.get(techName)};
+            qcDailyData[category] += 1;
+            qcPerformanceResult.set(techName, qcDailyData);
+
+            const [isDecal, isRepair, processCost] = calculateFinalCost(
+                category,
+                inventoryComments,
+                processCostsMap,
+                location
+            );
+
+            dailyWorkedOnUnits[inventoryId] = {
+                inventoryId,
+                PO,
+                serialNumber,
+                itemId,
+                condition,
+                processCost,
+                location,
+                category,
+                inventoryComments,
+                progress: `Receiving => Testing => ${isRepair ? "Repair => " : ""} QC => ${
+                    isDecal ? "Decal => " : ""
+                } Cleaning`,
+                isFinalCost: true
+            };
         }
     }
 }
+
+const extractEvents = (comments = "", keyword) => {
+    const res = [];
+    if (!comments || !keyword) return res;
+
+    let searchIndex = 0;
+
+    while (searchIndex < comments.length) {
+        const keywordIndex = comments.indexOf(keyword, searchIndex);
+
+        // if no more keyword, stop the loop
+        if (keywordIndex === -1) break;
+
+        // pointer just after the keyword
+        let ptr = keywordIndex + keyword.length;
+
+        // skip spaces/tabs
+        while (ptr < comments.length && (comments[ptr] === " " || comments[ptr] === "\t")) {
+            ptr++;
+        }
+
+        // optional "-" then spaces
+        if (comments[ptr] === "-") {
+            ptr++;
+            while (ptr < comments.length && (comments[ptr] === " " || comments[ptr] === "\t")) {
+                ptr++;
+            }
+        }
+
+        // find colon after tech
+        const colonIndex = comments.indexOf(":", ptr);
+        if (colonIndex === -1) {
+            // no colon => invalid pattern, move on to avoid infinite loop
+            searchIndex = keywordIndex + keyword.length;
+            continue;
+        }
+
+        const techName = comments.slice(ptr, colonIndex).trim();
+
+        // find end of line
+        let lineEnd = comments.indexOf("\n", colonIndex + 1);
+        if (lineEnd === -1) lineEnd = comments.length;
+
+        let rawDate = comments.slice(colonIndex + 1, lineEnd).trim();
+
+        // trim after GMT ... ) so Date can parse reliably
+        const gmtIndex = rawDate.indexOf("GMT");
+        if (gmtIndex !== -1) {
+            const closeParenIndex = rawDate.indexOf(")", gmtIndex);
+            if (closeParenIndex !== -1) {
+                rawDate = rawDate.slice(0, closeParenIndex + 1);
+            }
+        }
+
+        const dateObj = new Date(rawDate);
+
+        res.push({
+            keyword,
+            techName,
+            date: dateObj,
+            rawDate,
+        });
+
+        // IMPORTANT: move searchIndex forward so we don't re-find the same keyword
+        // advancing to lineEnd is usually safest:
+        searchIndex = lineEnd;
+    }
+
+    return res;
+};
 
 const calculateFinalCost = (category, inventoryComments, processCostsMap, location) => {
     if (location.trim() === "RTV") {return [false, false, 0];}
